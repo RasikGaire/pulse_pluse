@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Spider Man",
+    "location": "Parker Foundation, XYZ Road, Place, District",
+    "blood_type": "O+",
+    "contact": "XXXXXXXXXX"
+  },
+  {
+    "name": "Leo Messi",
+    "location": "Barcelona Foundation Building, XYZ Road, Place, District",
+    "blood_type": "A+",
+    "contact": "XXXXXXXXXX"
+  },
+  {
+    "name": "Iron Man",
+    "location": "Stark's Lab, Galaxy Road, Place, District",
+    "blood_type": "AB-",
+    "contact": "XXXXXXXXXX"
+  },
+  {
+    "name": "Tanjiro",
+    "location": "Demon Slayer, Kimetsu no yaiba, Place, District",
+    "blood_type": "B-",
+    "contact": "XXXXXXXXXX"
+  },
+  {
+    "name": "Captain America",
+    "location": "Avengers HQ, New York, NY",
+    "blood_type": "O-",
+    "contact": "XXXXXXXXXX"
+  }
+]

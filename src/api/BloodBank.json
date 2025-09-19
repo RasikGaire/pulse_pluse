@@ -1,0 +1,122 @@
+[
+  {
+    "name": "Global Blood Bank",
+    "location": "123 Healthway, City, State",
+    "blood_type": "A+",
+    "contact": "555-1234",
+    "availability": {
+      "A+": "High",
+      "B-": "Medium",
+      "O+": "High"
+    }
+  },
+  {
+    "name": "Community Blood Center",
+    "location": "456 Lifeline Rd, Town, State",
+    "blood_type": "AB-",
+    "contact": "555-5678",
+    "availability": {
+      "AB-": "Low",
+      "O-": "Medium"
+    }
+  },
+  {
+    "name": "National Blood Service",
+    "location": "789 Vitality Ave, Capital City",
+    "blood_type": "O+",
+    "contact": "555-9012",
+    "availability": {
+      "O+": "High",
+      "A-": "Low",
+      "B+": "High"
+    }
+  },
+  {
+    "name": "City Health Blood Bank",
+    "location": "101 Care Street, Metropolis",
+    "blood_type": "B+",
+    "contact": "555-3456",
+    "availability": {
+      "B+": "High",
+      "A+": "Medium",
+      "AB+": "Low"
+    }
+  },
+  {
+    "name": "Suburban Blood Drive Hub",
+    "location": "202 Helping Hand Blvd, Suburbia",
+    "blood_type": "O-",
+    "contact": "555-7890",
+    "availability": {
+      "O-": "High",
+      "B-": "Low",
+      "AB-": "Medium"
+    }
+  },
+  {
+    "name": "Regional Plasma Center",
+    "location": "303 Donor Way, Riverside",
+    "blood_type": "AB+",
+    "contact": "555-2109",
+    "availability": {
+      "AB+": "High",
+      "A+": "High",
+      "O-": "Low"
+    }
+  },
+  {
+    "name": "University Blood Bank",
+    "location": "404 Campus Road, University Town",
+    "blood_type": "A-",
+    "contact": "555-6543",
+    "availability": {
+      "A-": "Medium",
+      "B+": "Medium",
+      "O+": "High"
+    }
+  },
+  {
+    "name": "Evergreen Medical Center",
+    "location": "505 Mercy Lane, Evergreen",
+    "blood_type": "B-",
+    "contact": "555-8765",
+    "availability": {
+      "B-": "High",
+      "A+": "Low",
+      "O-": "High"
+    }
+  },
+  {
+    "name": "Hopeful Hearts Blood Bank",
+    "location": "606 Charity Circle, Hopeville",
+    "blood_type": "O+",
+    "contact": "555-4321",
+    "availability": {
+      "O+": "High",
+      "B-": "High",
+      "A-": "Medium"
+    }
+  },
+  {
+    "name": "Life Savers Blood Center",
+    "location": "707 Guardian Street, Sentinel",
+    "blood_type": "AB-",
+    "contact": "555-9876",
+    "availability": {
+      "AB-": "High",
+      "A-": "Low",
+      "B+": "Medium"
+    }
+  },
+  {
+    "name": "Beacon Blood Services",
+    "location": "808 Light Ave, Luminara",
+    "blood_type": "A+",
+    "contact": "555-5432",
+    "availability": {
+      "A+": "High",
+      "O+": "High",
+      "B-": "Low"
+    }
+  }
+]

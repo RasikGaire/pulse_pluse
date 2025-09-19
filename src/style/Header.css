@@ -1,0 +1,177 @@
+/* Navbar base */
+.navbar {
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 14px 40px; /* spacing left/right */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Full-width flex container */
+.navbar-grid {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative; /* allow centered nav */
+}
+
+/* Center the nav list on desktop */
+.nav-links {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.auth-buttons { margin-left: auto; }
+
+  /* Hamburger button */
+.hamburger {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+/* Logo styles */
+.logo h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.logo a {
+  text-decoration: none; /* remove underline */
+  color: inherit; /* keep .black and .theme colors */
+}
+
+.logo h1 .black {
+  color: #000; /* first half black */
+}
+
+.logo h1 .theme {
+  color: #c2185b; /* second half theme color */
+}
+
+/* Navigation links */
+.nav-links ul {
+  list-style: none;
+  display: flex;
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+}
+
+/* Hide mobile-only links on desktop */
+.nav-links ul .mobile-only { display: none; }
+
+.nav-links a {
+  text-decoration: none;
+  font-weight: 500;
+  color: #333;
+  padding-bottom: 3px;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+/* Animated underline effect */
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0%;
+  height: 2px;
+  background: #c2185b;
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: #c2185b;
+}
+
+.nav-links a:hover::after,
+.nav-links a.active::after {
+  width: 100%;
+}
+
+/* Auth buttons */
+.auth-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.login-btn,
+.register-btn {
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 4px;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+/* Login button */
+.login-btn {
+  border: 1px solid #ccc;
+  background: transparent;
+  color: #333;
+}
+
+.login-btn:hover {
+  background: #f1f1f1;
+}
+
+/* Register button */
+.register-btn {
+  background: #c2185b;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.register-btn:hover {
+  background: #a3144a;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .nav-links { position: static; transform: none; }
+  .hamburger { display: flex; }
+  .navbar-grid { gap: 12px; }
+  .logo { flex: 1; }
+  .nav-links { margin-left: auto; }
+  .nav-links ul {
+    display: none; /* hide links by default */
+    flex-direction: column;
+    background: #fff;
+    position: absolute;
+    top: 60px;
+    right: 40px;
+    width: 200px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 16px;
+  }
+
+  .nav-links ul li + li { margin-top: 10px; }
+  .nav-links ul .mobile-only { display: block; }
+
+  .nav-links.active ul {
+    display: flex; /* show when toggled */
+  }
+
+  .auth-buttons {
+    display: none; /* optional: hide on small screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 12px 20px;
+  }
+}
