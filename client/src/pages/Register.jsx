@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { FaEye, FaEyeSlash, FaApple } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 export const Register = () => {
   const navigate = useNavigate();
@@ -61,7 +61,7 @@ export const Register = () => {
       } else {
         setError(result.error || 'Registration failed. Please try again.');
       }
-    } catch (err) {
+    } catch {
       setError('Registration failed. Please try again.');
     } finally {
       setLoading(false);

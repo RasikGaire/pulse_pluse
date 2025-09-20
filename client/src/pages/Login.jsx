@@ -2,7 +2,7 @@
 import  { useState } from 'react';
 import { FaApple } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ export const Login = () => {
         setError(result.error || 'Login failed. Please check your credentials.');
       }
 
-    } catch (err) {
+    } catch {
       setError('Login failed. Please try again.');
     } finally {
       setLoading(false);

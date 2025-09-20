@@ -5,6 +5,11 @@ require('dotenv').config();
 
 // Import routes
 const userRoutes = require('./routes/user');
+const bloodRequestRoutes = require('./routes/bloodRequest');
+const bloodBankRoutes = require('./routes/bloodBank');
+const contactRoutes = require('./routes/contact');
+const hospitalRoutes = require('./routes/hospital');
+const notificationRoutes = require('./routes/notification');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -17,7 +22,7 @@ mongoose.connect(MONGODB_URI)
     console.log('✅ MongoDB connected successfully');
 })
 .catch((error) => {
-    console.error(' MongoDB connection error:', error);
+    console.error('❌ MongoDB connection error:', error);
     process.exit(1);
 });
 
@@ -25,10 +30,25 @@ mongoose.connect(MONGODB_URI)
 app.use(cors());
 app.use(express.json());
 
-// Routes
-
+// Health check route
+app.get('/', (req, res) => {
+    res.json({
+        success: true,
+        message: 'PulsePlush Blood Donation API is running',
+        version: '1.0.0',
+        timestamp: new Date().toISOString()
+    });
+});
 
 // API Routes
+app.use('/api/users', userRoutes);
+app.use('/api/blood-requests', bloodRequestRoutes);
+app.use('/api/blood-banks', bloodBankRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/hospitals', hospitalRoutes);
+app.use('/api/notifications', notificationRoutes);
+
+// Direct API routes for frontend compatibility
 app.use('/api', userRoutes);
 
 

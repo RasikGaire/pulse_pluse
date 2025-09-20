@@ -28,23 +28,37 @@ export const Home = () => {
       1: [
         { id: 1, name: "Tribhuvan University Teaching Hospital" },
         { id: 2, name: "Bir Hospital" },
-        { id: 3, name: "Nepal Medical College" }
+        { id: 3, name: "Nepal Medical College" },
+        { id: 12, name: "Grande International Hospital" },
+        { id: 13, name: "Om Hospital & Research Center" }
       ],
       2: [
         { id: 4, name: "Patan Hospital" },
-        { id: 5, name: "Lalitpur Hospital" }
+        { id: 5, name: "Lalitpur Hospital" },
+        { id: 14, name: "Alka Hospital" },
+        { id: 15, name: "Sumeru Hospital" },
+        { id: 16, name: "Norvic International Hospital" }
       ],
       3: [
         { id: 6, name: "Bhaktapur Hospital" },
-        { id: 7, name: "Bhaktapur Medical College" }
+        { id: 7, name: "Bhaktapur Medical College" },
+        { id: 17, name: "Khwopa Hospital" },
+        { id: 18, name: "Madhyapur Hospital" },
+        { id: 19, name: "Siddhi Memorial Hospital" }
       ],
       4: [
         { id: 8, name: "Pokhara Hospital" },
-        { id: 9, name: "Manipal Teaching Hospital" }
+        { id: 9, name: "Manipal Teaching Hospital" },
+        { id: 20, name: "Western Regional Hospital" },
+        { id: 21, name: "Gandaki Medical College" },
+        { id: 22, name: "Fishtail Hospital" }
       ],
       5: [
         { id: 10, name: "Chitwan Medical College" },
-        { id: 11, name: "Bharatpur Hospital" }
+        { id: 11, name: "Bharatpur Hospital" },
+        { id: 23, name: "College of Medical Sciences" },
+        { id: 24, name: "Narayani Hospital" },
+        { id: 25, name: "Chitwan Valley Medical College" }
       ]
     };
     return hospitalData[districtId] || [];

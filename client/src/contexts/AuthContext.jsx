@@ -1,14 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-
-const AuthContext = createContext();
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+import React, { useState, useEffect, useCallback } from 'react';
+import { AuthContext } from './AuthContextDef';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -102,11 +93,95 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Get auth headers for API calls
-  const getAuthHeaders = () => {
+  const getAuthHeaders = useCallback(() => {
     return {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     };
+  }, [token]);
+
+  // Fetch user profile
+  const fetchProfile = useCallback(async () => {
+    try {
+      console.log('AuthContext: Starting fetchProfile, token:', !!token);
+      
+      // Check if token exists
+      if (!token) {
+        console.log('AuthContext: No token available');
+        return { success: false, error: 'No authentication token found. Please login.' };
+      }
+      
+      const response = await fetch(`${API_BASE_URL}/profile`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('AuthContext: Response status:', response.status);
+      const data = await response.json();
+      console.log('AuthContext: Response data:', data);
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch profile');
+      }
+
+      // Update user data in state and localStorage
+      setUser(data.user);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      return { success: true, data: data.user };
+    } catch (error) {
+      console.log('AuthContext: Error in fetchProfile:', error);
+      return { success: false, error: error.message };
+    }
+  }, [token]);
+
+  // Update user profile
+  const updateProfile = useCallback(async (profileData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/profile`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(profileData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to update profile');
+      }
+
+      // Update user data in state and localStorage
+      setUser(data.user);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      return { success: true, data: data.user };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }, [getAuthHeaders]);
+
+  // Change password
+  const changePassword = async (currentPassword, newPassword) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/profile/password`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to change password');
+      }
+
+      return { success: true, message: data.message };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
   };
 
   const value = {
@@ -118,6 +193,9 @@ export const AuthProvider = ({ children }) => {
     logout,
     isAuthenticated,
     getAuthHeaders,
+    fetchProfile,
+    updateProfile,
+    changePassword,
   };
 
   return (

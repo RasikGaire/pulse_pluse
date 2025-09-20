@@ -46,6 +46,35 @@ module.exports.createAccessToken = (user) =>{
 	};
 	
 
+// [SECTION] Check if user is logged in (alternative middleware)
+module.exports.isLoggedIn = (req, res, next) => {
+	let token = req.headers.authorization;
+
+	if (typeof token === "undefined") {
+		return res.status(401).json({ 
+			success: false,
+			message: "No token provided" 
+		});
+	} else {
+		// Handle both "Bearer token" and just "token" formats
+		if (token.startsWith('Bearer ')) {
+			token = token.slice(7, token.length);
+		}
+
+		jwt.verify(token, process.env.JWT_SECRET_KEY, function(err, decodedToken) {
+			if (err) {
+				return res.status(403).json({ 
+					success: false,
+					message: "Invalid or expired token" 
+				});
+			} else {
+				req.user = decodedToken;  
+				next();  
+			}
+		});
+	}
+};
+
 
 module.exports.verifyAdmin = (req, res, next) => {
 	console.log(req.user);

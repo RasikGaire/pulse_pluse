@@ -2,7 +2,7 @@
 import { NavLink } from "react-router-dom";
 import { HiOutlineMenuAlt3 } from 'react-icons/hi';
 import { FaBell } from 'react-icons/fa';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import '../../style/Header.css';
 
 export const Header = () => {

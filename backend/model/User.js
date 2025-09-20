@@ -21,6 +21,88 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Password is Required'],
         minlength: [6, 'Password must be at least 6 characters long']
     },
+    phone: {
+        type: String,
+        trim: true,
+        match: [/^[\+]?[1-9][\d]{0,15}$/, 'Please enter a valid phone number']
+    },
+    address: {
+        type: String,
+        trim: true,
+        maxlength: [200, 'Address cannot exceed 200 characters']
+    },
+    district: {
+        type: String,
+        trim: true
+    },
+    // Location coordinates for proximity searches
+    location: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+        },
+        coordinates: {
+            type: [Number],
+            default: [0, 0],
+            index: '2dsphere'
+        }
+    },
+    bloodType: {
+        type: String,
+        enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+        uppercase: true
+    },
+    dateOfBirth: {
+        type: Date
+    },
+    profilePicture: {
+        type: String,
+        default: null
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    isDonor: {
+        type: Boolean,
+        default: false
+    },
+    lastDonationDate: {
+        type: Date
+    },
+    // Social Media Links
+    socialMedia: {
+        facebook: { type: String, default: '' },
+        instagram: { type: String, default: '' },
+        twitter: { type: String, default: '' },
+        linkedin: { type: String, default: '' },
+        youtube: { type: String, default: '' },
+        whatsapp: { type: String, default: '' }
+    },
+    // Communities the user is part of
+    communities: [{
+        name: { type: String, required: true },
+        joinedDate: { type: Date, default: Date.now },
+        role: { type: String, default: 'Member' }
+    }],
+    // Donation Statistics
+    donationStats: {
+        totalDonations: { type: Number, default: 0 },
+        volunteerHours: { type: Number, default: 0 },
+        lastDonationDate: { type: Date }
+    },
+    // Profile Description
+    description: {
+        type: String,
+        maxlength: [1000, 'Description cannot exceed 1000 characters']
+    },
+    // Availability for donation
+    availability: {
+        isAvailable: { type: Boolean, default: true },
+        availableDate: { type: Date },
+        notes: { type: String }
+    },
     createdAt: {
         type: Date,
         default: Date.now
