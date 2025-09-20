@@ -1,7 +1,13 @@
-import { useState } from 'react';
+//login page
+import  { useState } from 'react';
 import { FaApple } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export const Login = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -12,45 +18,30 @@ export const Login = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
+
+    if (!email || !password) {
+      setError('Please enter both your email and password.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // MOCK BACKEND (remove this block once backend is ready)
-      await new Promise((resolve) => setTimeout(resolve, 1200)); // simulate network delay
+      const result = await login(email, password);
 
-      if (email === "test@example.com" && password === "password123") {
-        setSuccess("Login successful! Redirecting...");
-        console.log("Mock login success", { email });
-
-        // Example: save fake token in localStorage
-        localStorage.setItem("token", "fake-jwt-token");
-
-        // redirect after success
+      if (result.success) {
+        setSuccess('Login successful! Redirecting...');
+        
+        // Redirect to home page after 1 second
         setTimeout(() => {
-          window.location.href = "/profile"; // replace with navigate() if using react-router
-        }, 1500);
-
+          navigate('/');
+        }, 1000);
       } else {
-        throw new Error("Invalid credentials. Try test@example.com / password123");
+        setError(result.error || 'Login failed. Please check your credentials.');
       }
 
-      // REAL API (use this when backend is ready)
-      /*
-      const response = await fetch("http://localhost:5000/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) throw new Error(data.message || "Login failed.");
-
-      setSuccess("Login successful! Redirecting...");
-      localStorage.setItem("token", data.token);
-      */
     } catch (err) {
-      setError(err.message);
+      setError('Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -64,7 +55,7 @@ export const Login = () => {
           <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-8 md:p-10">
             <h1 className="text-3xl md:text-4xl font-extrabold text-[#46052D] mb-2 text-center">Welcome Back!</h1>
             <p className="text-gray-600 mb-8 text-center">
-              Sign in to access your dashboard and continue your journey.
+              Sign in to access your dashboard and continue optimizing your QA process.
             </p>
 
             <form onSubmit={handleLogin} className="space-y-6">
@@ -97,8 +88,13 @@ export const Login = () => {
                 />
               </div>
 
-              {error && <p className="text-red-500 text-sm">{error}</p>}
-              {success && <p className="text-green-500 text-sm">{success}</p>}
+              {error && (
+                <p className="text-red-500 text-sm">{error}</p>
+              )}
+
+              {success && (
+                <p className="text-green-500 text-sm">{success}</p>
+              )}
 
               <button
                 type="submit"
@@ -137,7 +133,7 @@ export const Login = () => {
 
             <p className="text-sm mt-6 text-center text-gray-600">
               Don’t have an account?{' '}
-              <a href="/register" className="text-[#46052D] hover:underline font-medium">
+              <a href="#" className="text-[#46052D] hover:underline font-medium">
                 Sign Up
               </a>
             </p>
@@ -151,7 +147,8 @@ export const Login = () => {
         >
           <div className="absolute inset-0 bg-black opacity-50"></div>
           <div className="relative text-white z-10 text-center max-w-md">
-            <h2 className="text-2xl font-bold">“Give blood, save lives.”</h2>
+            
+       
           </div>
         </div>
       </div>

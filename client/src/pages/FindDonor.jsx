@@ -36,12 +36,18 @@ export const FindDonor = () => {
     // fetch("https://yourapi.com/blood-donors")
     //   .then(res => res.json())
     //   .then(data => setBloodDonors(data))
-    //   .catch(err => console.error(err));
+    //   .catch(err => {
+    //     // Handle error appropriately
+    //     setBloodDonors([]);
+    //   });
     //
     // fetch("https://yourapi.com/blood-banks")
     //   .then(res => res.json())
     //   .then(data => setBloodBanks(data))
-    //   .catch(err => console.error(err));
+    //   .catch(err => {
+    //     // Handle error appropriately
+    //     setBloodBanks([]);
+    //   });
 
   }, []);
 

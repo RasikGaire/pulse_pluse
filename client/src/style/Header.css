@@ -104,10 +104,13 @@
 .auth-buttons {
   display: flex;
   gap: 12px;
+  align-items: center;
 }
 
 .login-btn,
-.register-btn {
+.register-btn,
+.profile-btn,
+.logout-btn {
   padding: 6px 16px;
   font-size: 14px;
   font-weight: 500;
@@ -115,6 +118,7 @@
   text-decoration: none;
   border: 1px solid transparent;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 /* Login button */
@@ -137,6 +141,75 @@
 
 .register-btn:hover {
   background: #a3144a;
+}
+
+/* Profile button */
+.profile-btn {
+  background: #46052D;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.profile-btn:hover {
+  background: #2d0319;
+}
+
+/* Logout button */
+.logout-btn {
+  border: 1px solid #dc3545;
+  background: transparent;
+  color: #dc3545;
+}
+
+.logout-btn:hover {
+  background: #dc3545;
+  color: #fff;
+}
+
+/* User greeting */
+.user-greeting {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+/* Notification button */
+.notification-btn {
+  position: relative;
+  background: transparent;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-btn:hover {
+  background: #f1f1f1;
+  border-color: #46052D;
+  color: #46052D;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
 }
 
 /* Responsive adjustments */

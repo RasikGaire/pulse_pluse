@@ -1,42 +1,62 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaHandHoldingDroplet, FaWarehouse, FaTruckMedical } from "react-icons/fa6";
 import '../style/Home.css';
 
 export const Home = () => {
-  const [districts, setDistricts] = useState([]);
-  const [hospitals, setHospitals] = useState([]);
-  const [bloodGroups, setBloodGroups] = useState([]);
+  // Static data for demonstration
+  const districts = [
+    { id: 1, name: "Kathmandu" },
+    { id: 2, name: "Lalitpur" },
+    { id: 3, name: "Bhaktapur" },
+    { id: 4, name: "Pokhara" },
+    { id: 5, name: "Chitwan" }
+  ];
 
+  const bloodGroups = [
+    "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"
+  ];
+
+  const [hospitals, setHospitals] = useState([]);
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedHospital, setSelectedHospital] = useState("");
   const [selectedBloodGroup, setSelectedBloodGroup] = useState("");
   const [date, setDate] = useState("");
 
-  // Fetch districts
-  useEffect(() => {
-    fetch("http://localhost:5000/districts")
-      .then((res) => res.json())
-      .then((data) => setDistricts(data))
-      .catch((err) => console.error("Error fetching districts:", err));
-  }, []);
+  // Mock hospitals data based on selected district
+  const getHospitalsForDistrict = (districtId) => {
+    const hospitalData = {
+      1: [
+        { id: 1, name: "Tribhuvan University Teaching Hospital" },
+        { id: 2, name: "Bir Hospital" },
+        { id: 3, name: "Nepal Medical College" }
+      ],
+      2: [
+        { id: 4, name: "Patan Hospital" },
+        { id: 5, name: "Lalitpur Hospital" }
+      ],
+      3: [
+        { id: 6, name: "Bhaktapur Hospital" },
+        { id: 7, name: "Bhaktapur Medical College" }
+      ],
+      4: [
+        { id: 8, name: "Pokhara Hospital" },
+        { id: 9, name: "Manipal Teaching Hospital" }
+      ],
+      5: [
+        { id: 10, name: "Chitwan Medical College" },
+        { id: 11, name: "Bharatpur Hospital" }
+      ]
+    };
+    return hospitalData[districtId] || [];
+  };
 
-  // Fetch blood groups
-  useEffect(() => {
-    fetch("http://localhost:5000/bloodGroups")
-      .then((res) => res.json())
-      .then((data) => setBloodGroups(data))
-      .catch((err) => console.error("Error fetching blood groups:", err));
-  }, []);
-
-  // Fetch hospitals when district changes
-  useEffect(() => {
-    if (selectedDistrict) {
-      fetch(`http://localhost:5000/hospitals?districtId=${selectedDistrict}`)
-        .then((res) => res.json())
-        .then((data) => setHospitals(data))
-        .catch((err) => console.error("Error fetching hospitals:", err));
-    }
-  }, [selectedDistrict]);
+  // Handle district change
+  const handleDistrictChange = (e) => {
+    const districtId = e.target.value;
+    setSelectedDistrict(districtId);
+    setSelectedHospital("");
+    setHospitals(getHospitalsForDistrict(parseInt(districtId)));
+  };
 
   return (
     <div className="home">
@@ -54,7 +74,7 @@ export const Home = () => {
           <div className="filters">
             <select
               value={selectedDistrict}
-              onChange={(e) => setSelectedDistrict(e.target.value)}
+              onChange={handleDistrictChange}
             >
               <option value="">Select District</option>
               {districts.map((d) => (

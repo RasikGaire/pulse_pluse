@@ -1,8 +1,17 @@
 import React from 'react'
-import { FaFacebookF, FaInstagram, FaWhatsapp } from 'react-icons/fa'
+import { FaFacebookF, FaInstagram, FaWhatsapp, FaEdit } from 'react-icons/fa'
+import { useNavigate } from 'react-router-dom'
 
 export const Profile = () => {
- const [profile, setProfile] = React.useState(null);
+  const navigate = useNavigate();
+
+  const handleRequestBlood = () => {
+    navigate('/request-blood');
+  };
+
+  const handleEditProfile = () => {
+    navigate('/profile-verification');
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
@@ -17,13 +26,20 @@ export const Profile = () => {
           <div className="flex-1">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-3xl font-bold">Anjila Pun </h3>
+                <h3 className="text-3xl font-bold">Sandesh Thapa magar </h3>
                 <div className="mt-2 text-gray-600 flex flex-wrap gap-x-10 gap-y-1 text-sm">
-                  <span>Anjila@gmail.com</span>
-                  <span>9863173333</span>
-                  <span>Blood Type: B Positive</span>
+                  <span>sandesh@gmail.com</span>
+                  <span>9863173393</span>
+                  <span>Blood Type: A negative</span>
                 </div>
               </div>
+              <button
+                onClick={handleEditProfile}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#46052D] border border-[#46052D] rounded-lg hover:bg-[#46052D] hover:text-white transition duration-200"
+              >
+                <FaEdit size={16} />
+                Edit Profile
+              </button>
             </div>
 
             <hr className="my-6 border-gray-200" />
@@ -84,7 +100,12 @@ export const Profile = () => {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-4 mt-6 flex items-center gap-3 justify-end">
-        <button className="px-5 py-2 rounded-md border text-sm">Request Blood</button>
+        <button 
+          onClick={handleRequestBlood}
+          className="px-5 py-2 rounded-md border text-sm hover:bg-gray-50 transition duration-200"
+        >
+          Request Blood
+        </button>
         <button className="px-5 py-2 rounded-md text-white text-sm" style={{background:'#46052D'}}>Call Now</button>
         <span className="text-[10px] text-gray-400 ml-2">Use in case of emergency</span>
       </div>
