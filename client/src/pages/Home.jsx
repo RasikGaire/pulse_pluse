@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaHandHoldingDroplet, FaWarehouse, FaTruckMedical } from "react-icons/fa6";
 import '../style/Home.css';
 
 export const Home = () => {
+  const navigate = useNavigate();
+  
   // Static data for demonstration
   const districts = [
     { id: 1, name: "Kathmandu" },
@@ -72,6 +75,15 @@ export const Home = () => {
     setHospitals(getHospitalsForDistrict(parseInt(districtId)));
   };
 
+  // Handle button clicks to navigate to FindDonor page
+  const handleBeADonor = () => {
+    navigate('/find-donor?tab=donors');
+  };
+
+  const handleFindDonor = () => {
+    navigate('/find-donor?tab=banks');
+  };
+
   return (
     <div className="home">
       <section className="hero">
@@ -131,8 +143,8 @@ export const Home = () => {
           </div>
 
           <div className="hero-buttons">
-            <button className="btn-primary">Be a Donor</button>
-            <button className="btn-secondary">Find Donor</button>
+            <button className="btn-primary" onClick={handleBeADonor}>Be a Donor</button>
+            <button className="btn-secondary" onClick={handleFindDonor}>Find Donor</button>
           </div>
         </div>
       </section>

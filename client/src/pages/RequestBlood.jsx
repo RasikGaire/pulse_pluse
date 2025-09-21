@@ -1,24 +1,33 @@
 import React, { useState } from 'react';
-import { FaTint, FaCalendarAlt, FaPhone, FaHospital, FaMapMarkerAlt, FaFileAlt } from 'react-icons/fa';
+import { FaTint, FaCalendarAlt, FaPhone, FaHospital, FaMapMarkerAlt, FaFileAlt, FaSpinner, FaCheckCircle, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import { useNotifications } from '../hooks/useNotifications';
 
 export const RequestBlood = () => {
     const navigate = useNavigate();
+    const { user, isAuthenticated, getAuthHeaders } = useAuth();
+    const { addBloodRequestNotification } = useNotifications();
+    
+    // API base URL
+    const API_BASE_URL = 'http://localhost:5000/api';
     
     // State variables for form fields
     const [formData, setFormData] = useState({
         bloodGroup: '',
         appointmentDate: '',
-        phoneNumber: '',
+        phoneNumber: user?.phone || '',
         bloodUnits: '',
-        district: '',
+        district: user?.district || '',
         hospitalName: '',
-        description: ''
+        description: '',
+        urgency: 'normal' // normal, urgent, critical
     });
     
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     // Handle input changes
     const handleInputChange = (e) => {
@@ -29,11 +38,27 @@ export const RequestBlood = () => {
         }));
     };
 
+    // Handle modal close and navigation
+    const handleModalClose = () => {
+        setShowSuccessModal(false);
+        navigate('/blood-requests', { 
+            state: { refreshRequests: true },
+            replace: true 
+        });
+    };
+
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setSuccess('');
+
+        // Check if user is authenticated
+        if (!isAuthenticated()) {
+            setError('Please login to submit a blood request');
+            setTimeout(() => navigate('/login'), 2000);
+            return;
+        }
 
         // Basic validation
         if (!formData.bloodGroup) {
@@ -61,30 +86,144 @@ export const RequestBlood = () => {
             return;
         }
 
+        // Validate required fields
+        const requiredFields = {
+            bloodGroup: 'Blood Group',
+            bloodUnits: 'Blood Units', 
+            appointmentDate: 'Appointment Date',
+            phoneNumber: 'Phone Number',
+            district: 'District',
+            hospitalName: 'Hospital Name',
+            description: 'Description'
+        };
+
+        const missingFields = [];
+        Object.entries(requiredFields).forEach(([field, label]) => {
+            if (!formData[field] || formData[field].trim() === '') {
+                missingFields.push(label);
+            }
+        });
+
+        if (missingFields.length > 0) {
+            setError(`Please fill in the following required fields: ${missingFields.join(', ')}`);
+            return;
+        }
+
+        // Validate blood units
+        const bloodUnits = parseInt(formData.bloodUnits);
+        if (isNaN(bloodUnits) || bloodUnits < 1 || bloodUnits > 10) {
+            setError('Blood units must be a number between 1 and 10');
+            return;
+        }
+
+        // Validate phone number format
+        const phoneRegex = /^[+]?[1-9][\d]{0,15}$/;
+        if (!phoneRegex.test(formData.phoneNumber)) {
+            setError('Please enter a valid phone number (e.g., +9779800662455)');
+            return;
+        }
+
+        // Check if appointment date is not in the past
+        const appointmentDate = new Date(formData.appointmentDate);
+        const today = new Date();
+        if (appointmentDate < today) {
+            setError('Appointment date cannot be in the past');
+            return;
+        }
+
         setLoading(true);
 
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Map frontend urgency values to backend enum values
+            const getUrgencyLevel = (urgency) => {
+                switch (urgency) {
+                    case 'normal': return 'Low';
+                    case 'urgent': return 'High';
+                    case 'critical': return 'Critical';
+                    default: return 'Medium';
+                }
+            };
+
+            const mappedUrgencyLevel = getUrgencyLevel(formData.urgency);
+            console.log('Urgency mapping:', formData.urgency, '->', mappedUrgencyLevel);
+
+            const requestData = {
+                bloodGroup: formData.bloodGroup,
+                bloodUnits: parseInt(formData.bloodUnits), // Convert to number
+                appointmentDate: formData.appointmentDate,
+                phoneNumber: formData.phoneNumber,
+                district: formData.district,
+                hospitalName: formData.hospitalName,
+                description: formData.description,
+                urgencyLevel: mappedUrgencyLevel, // Map urgency to backend enum
+                isEmergency: formData.urgency === 'critical' // Only critical is emergency
+            };
+
+            console.log('Sending request data:', requestData);
+            console.log('Auth headers:', getAuthHeaders());
+
+            const response = await fetch(`${API_BASE_URL}/blood-requests/create`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(requestData)
+            });
+
+            // Check if response is actually JSON before parsing
+            const contentType = response.headers.get('content-type');
+            let data = {};
             
-            setSuccess('Blood request submitted successfully! We will contact you soon.');
-            
-            // Reset form after successful submission
-            setTimeout(() => {
-                setFormData({
-                    bloodGroup: '',
-                    appointmentDate: '',
-                    phoneNumber: '',
-                    bloodUnits: '',
-                    district: '',
-                    hospitalName: '',
-                    description: ''
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                // If it's not JSON, it's likely an HTML error page
+                const text = await response.text();
+                console.error('Server returned non-JSON response:', text);
+                throw new Error('Server returned an error page instead of JSON');
+            }
+
+            if (!response.ok) {
+                console.error('Server response error:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: data
                 });
-                setSuccess('');
-            }, 3000);
+                
+                // Log the specific validation errors
+                if (data.errors && Array.isArray(data.errors)) {
+                    console.error('Specific validation errors:', data.errors);
+                    throw new Error(`Validation errors: ${data.errors.join(', ')}`);
+                } else if (data.message) {
+                    throw new Error(data.message);
+                } else {
+                    throw new Error(`Server error: ${response.status} ${response.statusText}`);
+                }
+            }
             
-        } catch (err) {
-            setError('Request failed. Please try again.');
+            // Add notification to navbar
+            addBloodRequestNotification({
+                bloodType: formData.bloodGroup,
+                urgencyLevel: formData.urgency,
+                patientName: formData.description ? 'Patient' : 'Anonymous',
+                hospitalName: formData.hospitalName
+            });
+            
+            // Show success modal instead of text message
+            setShowSuccessModal(true);
+            
+            // Reset form
+            setFormData({
+                bloodGroup: '',
+                appointmentDate: '',
+                phoneNumber: user?.phone || '',
+                bloodUnits: '',
+                district: user?.district || '',
+                hospitalName: '',
+                description: '',
+                urgency: 'normal'
+            });
+            
+        } catch (error) {
+            setError(error.message || 'Request failed. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -185,11 +324,32 @@ export const RequestBlood = () => {
                                         type="number"
                                         placeholder="Enter number of units needed"
                                         min="1"
+                                        max="10"
                                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#46052D] bg-gray-50"
                                         value={formData.bloodUnits}
                                         onChange={handleInputChange}
                                         disabled={loading}
                                     />
+                                </div>
+
+                                {/* Urgency */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="urgency">
+                                        <FaFileAlt className="inline mr-2 text-yellow-500" />
+                                        Urgency Level
+                                    </label>
+                                    <select
+                                        id="urgency"
+                                        name="urgency"
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#46052D] bg-gray-50"
+                                        value={formData.urgency}
+                                        onChange={handleInputChange}
+                                        disabled={loading}
+                                    >
+                                        <option value="normal">Normal (3-7 days)</option>
+                                        <option value="urgent">Urgent (1-2 days)</option>
+                                        <option value="critical">Critical (Immediate)</option>
+                                    </select>
                                 </div>
 
                                 {/* District */}
@@ -272,18 +432,67 @@ export const RequestBlood = () => {
                             </button>
                             <button
                                 type="submit"
-                                className={`flex-1 py-3 px-6 text-white font-semibold rounded-xl transition duration-300 transform hover:scale-105 ${
+                                className={`flex-1 py-3 px-6 text-white font-semibold rounded-xl transition duration-300 transform hover:scale-105 flex items-center justify-center gap-2 ${
                                     loading ? "opacity-80 cursor-not-allowed" : "hover:opacity-95"
                                 }`}
                                 style={{ backgroundColor: "#46052D" }}
                                 disabled={loading}
                             >
+                                {loading && <FaSpinner className="animate-spin" />}
                                 {loading ? "Sending Request..." : "Send Request"}
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
+
+            {/* Success Modal */}
+            {showSuccessModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-pulse">
+                    <div className="bg-white rounded-2xl p-8 max-w-md mx-4 relative transform transition-all duration-300 scale-100 opacity-100">
+                        {/* Close button */}
+                        <button
+                            onClick={handleModalClose}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                            <FaTimes size={20} />
+                        </button>
+                        
+                        {/* Success content */}
+                        <div className="text-center">
+                            <div className="mb-4">
+                                <div className="inline-block p-4 rounded-full bg-green-100 mb-4">
+                                    <FaCheckCircle size={48} className="text-green-500" />
+                                </div>
+                            </div>
+                            
+                            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                                Request Submitted Successfully!
+                            </h3>
+                            
+                            <p className="text-gray-600 mb-6">
+                                Your blood request has been submitted successfully. We will contact you soon with available donors in your area.
+                            </p>
+                            
+                            <div className="space-y-3">
+                                <button
+                                    onClick={handleModalClose}
+                                    className="w-full py-3 px-6 bg-[#46052D] text-white font-semibold rounded-xl hover:bg-[#670A37] transition duration-300 transform hover:scale-105"
+                                >
+                                    View My Requests
+                                </button>
+                                
+                                <button
+                                    onClick={() => setShowSuccessModal(false)}
+                                    className="w-full py-3 px-6 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition duration-300"
+                                >
+                                    Submit Another Request
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

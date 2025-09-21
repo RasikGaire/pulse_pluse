@@ -3,10 +3,12 @@ import { NavLink } from "react-router-dom";
 import { HiOutlineMenuAlt3 } from 'react-icons/hi';
 import { FaBell } from 'react-icons/fa';
 import { useAuth } from '../../hooks/useAuth';
+import { useNotifications } from '../../hooks/useNotifications';
 import '../../style/Header.css';
 
 export const Header = () => {
   const { user, isAuthenticated, logout } = useAuth();
+  const { unreadCount } = useNotifications();
 
   const toggleMenu = () => {
     const nav = document.querySelector('.nav-links');
@@ -89,7 +91,9 @@ export const Header = () => {
                 {/* Notification Button */}
                 <button className="notification-btn" aria-label="Notifications">
                   <FaBell size={18} />
-                  <span className="notification-badge">3</span>
+                  {unreadCount > 0 && (
+                    <span className="notification-badge">{unreadCount}</span>
+                  )}
                 </button>
                 <NavLink to="/profile" className="profile-btn">Profile</NavLink>
                 <button onClick={handleLogout} className="logout-btn">Logout</button>

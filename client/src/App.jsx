@@ -2,6 +2,7 @@ import React from 'react';
 import { AppLayout } from './components/Layout/AppLayout';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import { Home } from './pages/Home';
 import { FindDonor } from './pages/FindDonor';
 import { Contact } from './pages/Contact';
@@ -11,6 +12,7 @@ import {Register} from './pages/Register';
 import { Profile } from './pages/Profile';
 import { ProfileVerification } from './pages/ProfileVerification';
 import { RequestBlood } from './pages/RequestBlood';
+import { BloodRequestDashboard } from './pages/BloodRequestDashboard';
 import { ErrorPage } from './pages/ErrorPage'; 
 import './App.css';
 const router = createBrowserRouter([
@@ -28,15 +30,18 @@ const router = createBrowserRouter([
       { path: '/profile', element: <Profile /> },
       { path: '/profile-verification', element: <ProfileVerification /> },
       { path: '/request-blood', element: <RequestBlood /> },
+      { path: '/blood-requests', element: <BloodRequestDashboard /> },
     ]
   } 
 ]);
 
 const App = () => {
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <NotificationProvider>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </NotificationProvider>
   );
 };
 

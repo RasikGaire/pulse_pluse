@@ -9,14 +9,37 @@ export const AuthProvider = ({ children }) => {
   // API base URL
   const API_BASE_URL = 'http://localhost:5000/api';
 
+  // Check if backend server is accessible
+  const checkServerConnection = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/health`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      return response.ok;
+    } catch (error) {
+      console.log('Server connection check failed:', error);
+      return false;
+    }
+  }, []);
+
   // Check if user is logged in on app start
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
     
     if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+      try {
+        // Parse the stored user to check if it's valid JSON
+        const userData = JSON.parse(storedUser);
+        setToken(storedToken);
+        setUser(userData);
+      } catch (error) {
+        console.error('Invalid user data in localStorage, clearing...', error);
+        // Clear corrupted data
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
     }
     setLoading(false);
   }, []);
@@ -87,6 +110,15 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
   };
 
+  // Handle authentication errors (expired/invalid tokens)
+  const handleAuthError = useCallback(() => {
+    console.log('AuthContext: Handling auth error - clearing user session');
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  }, []);
+
   // Check if user is authenticated
   const isAuthenticated = () => {
     return !!user && !!token;
@@ -120,6 +152,18 @@ export const AuthProvider = ({ children }) => {
       });
 
       console.log('AuthContext: Response status:', response.status);
+      
+      // Handle authentication errors (401/403)
+      if (response.status === 401 || response.status === 403) {
+        console.log('AuthContext: Authentication failed, clearing session');
+        handleAuthError();
+        return { 
+          success: false, 
+          error: 'Your session has expired. Please login again.',
+          authError: true 
+        };
+      }
+
       const data = await response.json();
       console.log('AuthContext: Response data:', data);
 
@@ -134,9 +178,19 @@ export const AuthProvider = ({ children }) => {
       return { success: true, data: data.user };
     } catch (error) {
       console.log('AuthContext: Error in fetchProfile:', error);
+      
+      // If it's a network error and we have stored user data, use that temporarily
+      if (error.name === 'TypeError' && user) {
+        return { 
+          success: false, 
+          error: 'Unable to connect to server. Showing cached profile data.',
+          networkError: true 
+        };
+      }
+      
       return { success: false, error: error.message };
     }
-  }, [token]);
+  }, [token, handleAuthError, user]);
 
   // Update user profile
   const updateProfile = useCallback(async (profileData) => {
@@ -196,6 +250,8 @@ export const AuthProvider = ({ children }) => {
     fetchProfile,
     updateProfile,
     changePassword,
+    handleAuthError,
+    checkServerConnection,
   };
 
   return (

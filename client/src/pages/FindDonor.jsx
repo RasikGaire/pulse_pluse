@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { FaFacebookF, FaInstagram, FaWhatsapp, FaSpinner, FaSearch } from "react-icons/fa";
 
 export const FindDonor = () => {
-  const [activeTab, setActiveTab] = useState("banks");
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const tabFromUrl = searchParams.get('tab');
+  
+  const [activeTab, setActiveTab] = useState(tabFromUrl === 'donors' ? "donors" : "banks");
   const [bloodDonors, setBloodDonors] = useState([]);
   const [bloodBanks, setBloodBanks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -96,6 +101,16 @@ export const FindDonor = () => {
 
     loadData();
   }, []);
+
+  // Handle URL parameter changes
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl === 'donors') {
+      setActiveTab('donors');
+    } else if (tabFromUrl === 'banks') {
+      setActiveTab('banks');
+    }
+  }, [searchParams]);
 
   // Handle search filter changes
   const handleFilterChange = async (filterType, value) => {
@@ -213,7 +228,12 @@ export const FindDonor = () => {
                 </div>
               </div>
               <div className="flex items-center gap-3 justify-start">
-                <button className="px-5 py-2 rounded-md border text-sm hover:bg-gray-100">Request Blood</button>
+                <button 
+                  onClick={() => navigate('/request-blood')}
+                  className="px-5 py-2 rounded-md border text-sm hover:bg-gray-100 transition-colors"
+                >
+                  Request Blood
+                </button>
                 <button className="px-5 py-2 rounded-md text-white text-sm bg-[#46052D] hover:bg-[#670A37]">Call Now</button>
                 <span className="text-[10px] text-gray-400 ml-2">Use in case of emergency</span>
               </div>
@@ -352,7 +372,10 @@ export const FindDonor = () => {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-3 justify-start">
-            <button className="px-6 py-3 rounded-md border border-[#670A37] text-[#670A37] text-sm font-medium hover:bg-gray-100 transition-colors">
+            <button 
+              onClick={() => navigate('/request-blood')}
+              className="px-6 py-3 rounded-md border border-[#670A37] text-[#670A37] text-sm font-medium hover:bg-gray-100 transition-colors"
+            >
               Request Blood
             </button>
             <button className="px-6 py-3 rounded-md text-white text-sm font-medium bg-[#46052D] hover:bg-[#670A37] transition-colors">
@@ -381,6 +404,12 @@ export const FindDonor = () => {
             className={`px-6 py-2 rounded-full border transition-all duration-200 ${activeTab === "banks" ? "bg-[#670A37] text-white shadow-md" : "bg-white text-gray-800"}`}
           >
             Blood Banks
+          </button>
+          <button
+            onClick={() => navigate('/request-blood')}
+            className="px-6 py-2 rounded-full bg-[#46052D] text-white border border-[#46052D] hover:bg-[#670A37] transition-all duration-200 shadow-md"
+          >
+            Request Blood
           </button>
         </div>
 

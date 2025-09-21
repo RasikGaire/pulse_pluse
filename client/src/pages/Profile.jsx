@@ -20,13 +20,28 @@ export const Profile = () => {
         setLoading(true);
         const result = await fetchProfile();
         console.log('Profile: fetchProfile result:', result);
+        
         if (result.success) {
           setProfileData(result.data);
           setError(null);
           console.log('Profile: Profile data set successfully');
         } else {
-          setError(result.error);
-          console.log('Profile: Error from fetchProfile:', result.error);
+          // Handle authentication errors differently
+          if (result.authError) {
+            console.log('Profile: Auth error detected, redirecting to login');
+            navigate('/login');
+            return;
+          }
+          
+          // Handle network errors by showing cached data
+          if (result.networkError && user) {
+            console.log('Profile: Network error, using cached user data');
+            setProfileData(user);
+            setError('Unable to connect to server. Showing cached data.');
+          } else {
+            setError(result.error);
+            console.log('Profile: Error from fetchProfile:', result.error);
+          }
         }
       } catch (err) {
         console.log('Profile: Exception in loadProfile:', err);
@@ -56,6 +71,10 @@ export const Profile = () => {
     navigate('/request-blood');
   };
 
+  const handleViewRequests = () => {
+    navigate('/blood-requests');
+  };
+
   const handleEditProfile = () => {
     navigate('/profile-verification');
   };
@@ -65,10 +84,24 @@ export const Profile = () => {
       setLoading(true);
       setError(null);
       const result = await fetchProfile();
+      
       if (result.success) {
         setProfileData(result.data);
       } else {
-        setError(result.error);
+        // Handle authentication errors
+        if (result.authError) {
+          console.log('Profile: Auth error on retry, redirecting to login');
+          navigate('/login');
+          return;
+        }
+        
+        // Handle network errors
+        if (result.networkError && user) {
+          setProfileData(user);
+          setError('Unable to connect to server. Showing cached data.');
+        } else {
+          setError(result.error);
+        }
       }
     } catch {
       setError('Failed to load profile');
@@ -109,14 +142,34 @@ export const Profile = () => {
   if (error) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-10">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-600">Error: {error}</p>
-          <button 
-            onClick={handleRetry}
-            className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-          >
-            Retry
-          </button>
+        <div className={`border rounded-lg p-4 ${
+          error.includes('cached data') 
+            ? 'bg-yellow-50 border-yellow-200' 
+            : 'bg-red-50 border-red-200'
+        }`}>
+          <p className={error.includes('cached data') ? 'text-yellow-600' : 'text-red-600'}>
+            {error}
+          </p>
+          <div className="mt-3 flex gap-2">
+            <button 
+              onClick={handleRetry}
+              className={`px-4 py-2 text-white rounded transition-colors ${
+                error.includes('cached data')
+                  ? 'bg-yellow-600 hover:bg-yellow-700'
+                  : 'bg-red-600 hover:bg-red-700'
+              }`}
+            >
+              Retry
+            </button>
+            {error.includes('session has expired') && (
+              <button 
+                onClick={() => navigate('/login')}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+              >
+                Login Again
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -305,14 +358,20 @@ export const Profile = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-4 mt-6 flex items-center gap-3 justify-end">
+      <div className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-4 mt-6 flex flex-col sm:flex-row items-center gap-3 justify-end">
+        <button 
+          onClick={handleViewRequests}
+          className="w-full sm:w-auto px-5 py-2 rounded-md border border-[#46052D] text-[#46052D] text-sm hover:bg-[#46052D] hover:text-white transition duration-200"
+        >
+          View My Requests
+        </button>
         <button 
           onClick={handleRequestBlood}
-          className="px-5 py-2 rounded-md border text-sm hover:bg-gray-50 transition duration-200"
+          className="w-full sm:w-auto px-5 py-2 rounded-md border text-sm hover:bg-gray-50 transition duration-200"
         >
           Request Blood
         </button>
-        <button className="px-5 py-2 rounded-md text-white text-sm" style={{background:'#46052D'}}>Call Now</button>
+        <button className="w-full sm:w-auto px-5 py-2 rounded-md text-white text-sm" style={{background:'#46052D'}}>Call Now</button>
         <span className="text-[10px] text-gray-400 ml-2">Use in case of emergency</span>
       </div>
     </div>
